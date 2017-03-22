@@ -1,0 +1,26 @@
+{
+  "name": "innosoft-ajax",
+  "version": "1.0.0",
+  "description": "Makes writing Ajax requests with XMLHttpRequest easier",
+  "main": "ajax.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/innosoftvn/ajax.git"
+  },
+  "keywords": [
+    "Ajax",
+    "fetch",
+    "API",
+    "JSON",
+    "REST"
+  ],
+  "author": "Innosoft <innosoftcantho@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/innosoftvn/ajax/issues"
+  },
+  "homepage": "https://github.com/innosoftvn/ajax#readme"
+}
