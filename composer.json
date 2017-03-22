@@ -1,0 +1,12 @@
+{
+    "name": "innosoft/ajax",
+    "description": "Makes writing Ajax requests with XMLHttpRequest easier",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Innosoft",
+            "email": "innosoftcantho@gmail.com"
+        }
+    ],
+    "require": {}
+}
