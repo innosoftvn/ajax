@@ -34,6 +34,12 @@ Node
     });
 
 #### Options
+##### `url`<br>
+A string containing the URL to which the request is sent.
+##### `method`<br>
+The HTTP method to use for the request.
+##### `data`<br>
+Data to be sent to the server.
 ##### `beforeSend: function( XMLHttpRequest xhr, Object settings )`<br>
 A pre-request callback function that can be used to modify the xhr (XMLHTTPRequest) object before it is sent. Use this to set custom headers, etc. The xhr and settings objects are passed as arguments. This is an Ajax Event. Returning `false` in the beforeSend function will cancel the request.
 ##### `complete: function( XMLHttpRequest xhr, Number status )`<br>
@@ -43,19 +49,19 @@ A function to be called if the request succeeds.
 ##### `error: function( XMLHttpRequest xhr, Number status )`<br>
 A function to be called if the request fails.
 #### Ajax setup
-Set default values for future Ajax requests. Its use is not recommended.
+Set default values for future Ajax requests. Its use is not recommended.<br>
 For example, CSRF Protection in Laravel.
 
     <meta name="csrf-token" content="{{ csrf_token() }}">
     ....
     ....
     <script type="text/javascript">
-	    ajax.setup({
-		    headers: {
-		    	'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-		    }
-		});
-	</script>
+	ajax.setup({
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            }
+	});
+    </script>
 
 ## Browser Support
 ![chrome](https://cloud.githubusercontent.com/assets/7092420/24220167/e269228c-0f7b-11e7-97ca-ffb3e92134ed.jpg)|![firefox](https://cloud.githubusercontent.com/assets/7092420/24220162/e263c6a2-0f7b-11e7-90b0-7b84048b55c6.jpg)|![safari](https://cloud.githubusercontent.com/assets/7092420/24220166/e267f380-0f7b-11e7-884b-1516507948f2.jpg)|![edge](https://cloud.githubusercontent.com/assets/7092420/24220165/e2653d0c-0f7b-11e7-8ff8-fee09ab30a72.jpg)|![opera](https://cloud.githubusercontent.com/assets/7092420/24220164/e2641288-0f7b-11e7-9a3a-59fd105b267f.jpg)|![ie](https://cloud.githubusercontent.com/assets/7092420/24220163/e263d156-0f7b-11e7-8c89-7dd480fd98fb.jpg)
