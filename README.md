@@ -13,41 +13,21 @@ Node
 ## Usage
 #### Examples
 
-    ajax({
-        url: '/posts',
-        method: 'POST',
-        data: {
-            title: 'Ajax is simple'
-        },
-        beforeSend: function(xhr, settings){
-	        //
-        },
-        complete: function(xhr, status){
-	        //
-        },
-        success: function(data, status){
-	        //
-        },
-        error: function(xhr, status){
-	        //
-        }
+    ajax('/posts').before(function(){
+        //
+    }).post({
+        title: 'Ajax is simple'
+    }).then(function(status, data){
+        //
     });
 
 #### Options
-##### `url`<br>
-A string containing the URL to which the request is sent.
-##### `method`<br>
-The HTTP method to use for the request.
-##### `data`<br>
-Data to be sent to the server.
-##### `beforeSend: function( XMLHttpRequest xhr, Object settings )`<br>
+##### before
 A pre-request callback function that can be used to modify the xhr (XMLHTTPRequest) object before it is sent. Use this to set custom headers, etc. The xhr and settings objects are passed as arguments. This is an Ajax Event. Returning `false` in the beforeSend function will cancel the request.
-##### `complete: function( XMLHttpRequest xhr, Number status )`<br>
-A function to be called when the request finishes (after `success` and `error` callbacks are executed).
-##### `success: function( Object data, Number status )`<br>
-A function to be called if the request succeeds.
-##### `error: function( XMLHttpRequest xhr, Number status )`<br>
-A function to be called if the request fails.
+##### method (default: `'POST'`)
+The HTTP method to use for the request
+##### then
+A function to be called when the request finishes.
 #### Ajax setup
 Set default values for future Ajax requests. Its use is not recommended.<br>
 For example, CSRF Protection in Laravel.
