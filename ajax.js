@@ -28,50 +28,92 @@
         return query;
     }
 
-    function ajax(settings) {
-        var opts = settings || {};
-        defaults(opts, __ajaxSetup__);
+    function ajax(url, method, data, settings, httpRequest) {
+        var _ = {};
 
-        httpRequest = new XMLHttpRequest();
+        _.url = url;
+        _.method = method || 'POST';
+        _.data = data || {};
+        _.settings = settings || {};
+        _.httpRequest = httpRequest || new XMLHttpRequest();
 
-        if (!httpRequest) {
+        if (!_.httpRequest) {
             console.log('Giving up :( Cannot create an XMLHTTP instance');
             return false;
         }
 
-        if (opts.beforeSend && opts.beforeSend.call(this, httpRequest, opts) === false) {
-            httpRequest.abort();
-            return false;
-        }
-
-        httpRequest.onreadystatechange = function () {
-            if (httpRequest.readyState === XMLHttpRequest.DONE) {
-                if (httpRequest.status === 200) {
-                    if (opts.success && typeof opts.success == 'function') {
-                        opts.success.call(this, httpRequest.response, httpRequest.status, httpRequest);
-                    }
-                } else {
-                    if (opts.error && typeof opts.error == 'function') {
-                        opts.error.call(this, httpRequest, httpRequest.status);
-                    }
-                }
-                if (opts.complete && typeof opts.complete == 'function') {
-                    opts.complete.call(this, httpRequest, httpRequest.status);
-                }
-            }
+        _.get = function (data) {
+            defaults(_.data, data);
+            return ajax(_.url, 'GET', _.data, _.settings, _.httpRequest);
         };
 
-        httpRequest.open(opts.method, opts.url);
-        httpRequest.responseType = 'json';
-        opts.headers = opts.headers || {};
-        defaults(opts.headers, {
-            'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
-        });
-        for (var prop in opts.headers) {
-            httpRequest.setRequestHeader(prop, opts.headers[prop]);
-        }
+        _.post = function (data) {
+            defaults(_.data, data);
+            return ajax(_.url, 'POST', _.data, _.settings, _.httpRequest);
+        };
 
-        httpRequest.send(getQuery(opts.data || {}).join('&'));
+        _.put = function (data) {
+            defaults(_.data, data);
+            return ajax(_.url, 'PUT', _.data, _.settings, _.httpRequest);
+        };
+
+        _.patch = function (data) {
+            defaults(_.data, data);
+            return ajax(_.url, 'PATCH', _.data, _.settings, _.httpRequest);
+        };
+
+//        _.delete = function (data) {
+//            defaults(_.data, data);
+//            return ajax(_.url, 'DELETE', _.data, _.settings, _.httpRequest);
+//        };
+
+        _.before = function (callback) {
+            if (callback.call(this) === false) {
+                defaults(_.settings, {abort: true});
+            }
+            ;
+            return ajax(_.url, _.method, _.data, _.settings, _.httpRequest);
+        };
+
+        _.then = function (callback) {
+            if (_.settings.abort && _.settings.abort === true)
+                return false;
+            defaults(_.settings, __ajaxSetup__);
+            _.httpRequest.onreadystatechange = function () {
+                if (_.httpRequest.readyState === XMLHttpRequest.DONE) {
+                    if (callback && typeof callback == 'function') {
+                        var statusText = 'info';
+                        if (_.httpRequest.status >= 200) {
+                            statusText = 'success';
+                        }
+                        if (_.httpRequest.status >= 300) {
+                            statusText = 'warning';
+                        }
+                        if (_.httpRequest.status >= 400) {
+                            statusText = 'danger';
+                        }
+                        callback.call(this, statusText, _.httpRequest.response);
+                    }
+                }
+            };
+            if (_.method == 'GET') {
+                _.url = [_.url, getQuery(_.data || {}).join('&')].join('?');
+                _.data = {};
+            }
+            _.httpRequest.open(_.method, _.url);
+            _.httpRequest.responseType = 'json';
+            _.settings.headers = _.settings.headers || {};
+            defaults(_.settings.headers, {
+                'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
+            });
+            for (var prop in _.settings.headers) {
+                _.httpRequest.setRequestHeader(prop, _.settings.headers[prop]);
+            }
+
+            _.httpRequest.send(getQuery(_.data || {}).join('&'));
+        };
+
+        return _;
     }
 
     ajax.setup = function (settings) {
