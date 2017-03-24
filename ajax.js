@@ -1,5 +1,7 @@
 (function (window) {
-    var __ajaxSetup__ = {};
+    "use strict";
+
+    var __ajaxSetup__ = {}, ajax = {};
 
     function defaults(target, obj) {
         for (var prop in obj) {
@@ -28,11 +30,11 @@
         return query;
     }
 
-    function ajax(url, method, data, settings, httpRequest) {
+    function _fetch(url, method, data, settings, httpRequest) {
         var _ = {};
 
-        _.url = url;
-        _.method = method || 'POST';
+        _.url = url || '';
+        _.method = method || 'GET';
         _.data = data || {};
         _.settings = settings || {};
         _.httpRequest = httpRequest || new XMLHttpRequest();
@@ -42,42 +44,17 @@
             return false;
         }
 
-        _.get = function (data) {
-            defaults(_.data, data);
-            return ajax(_.url, 'GET', _.data, _.settings, _.httpRequest);
-        };
-
-        _.post = function (data) {
-            defaults(_.data, data);
-            return ajax(_.url, 'POST', _.data, _.settings, _.httpRequest);
-        };
-
-        _.put = function (data) {
-            defaults(_.data, data);
-            return ajax(_.url, 'PUT', _.data, _.settings, _.httpRequest);
-        };
-
-        _.patch = function (data) {
-            defaults(_.data, data);
-            return ajax(_.url, 'PATCH', _.data, _.settings, _.httpRequest);
-        };
-
-//        _.delete = function (data) {
-//            defaults(_.data, data);
-//            return ajax(_.url, 'DELETE', _.data, _.settings, _.httpRequest);
-//        };
-
         _.before = function (callback) {
             if (callback.call(this) === false) {
                 defaults(_.settings, {abort: true});
             }
-            ;
-            return ajax(_.url, _.method, _.data, _.settings, _.httpRequest);
+            return _fetch(_.url, _.method, _.data, _.settings, _.httpRequest);
         };
 
         _.then = function (callback) {
-            if (_.settings.abort && _.settings.abort === true)
+            if (_.settings.abort && _.settings.abort === true){
                 return false;
+            }
             defaults(_.settings, __ajaxSetup__);
             _.httpRequest.onreadystatechange = function () {
                 if (_.httpRequest.readyState === XMLHttpRequest.DONE) {
@@ -116,8 +93,28 @@
         return _;
     }
 
-    ajax.setup = function (settings) {
+    ajax.setup = function(settings){
         defaults(__ajaxSetup__, settings);
+    };
+
+    ajax.get = function(url, data){
+        return new _fetch(url, 'GET', data);
+    };
+
+    ajax.post = function(url, data){
+        return new _fetch(url, 'POST', data);
+    };
+
+    ajax.put = function(url, data){
+        return new _fetch(url, 'PUT', data);
+    };
+
+    ajax.patch = function(url, data){
+        return new _fetch(url, 'PATCH', data);
+    };
+
+    ajax['delete'] = function(url, data){
+        return new _fetch(url, 'DELETE', data);
     };
 
     // Support CommonJS, AMD & browser
