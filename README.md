@@ -30,7 +30,7 @@ The HTTP method to use for the request.
     ajax.patch(String url, Object data)
     ajax.delete(String url, Object data)
 
-##### before: `function(Object settings)`
+##### before: `function()`
 A pre-request callback function that can be used to modify the xhr (XMLHTTPRequest) object before it is sent. Use this to set custom headers, etc. The xhr and settings objects are passed as arguments. This is an Ajax Event. Returning `false` in the before function will cancel the request.
 ##### then: `function(String status, mixed data)`
 A function to be called when the request finishes.
