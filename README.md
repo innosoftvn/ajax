@@ -2,7 +2,6 @@
   <img src="https://cloud.githubusercontent.com/assets/7092420/24218424/e3ffebcc-0f75-11e7-886f-6b3ed1929849.png" alt="logo">
 </p>
 
-
 Makes writing Ajax requests with XMLHttpRequest easier
 
 ## Installation
@@ -13,20 +12,27 @@ Node
 ## Usage
 #### Examples
 
-    ajax('/posts').before(function(){
-        //
-    }).post({
+    ajax.post('/posts', {
         title: 'Ajax is simple'
+    }).before(function(){
+        //
     }).then(function(status, data){
         //
     });
 
 #### Options
-##### before
+##### method: `GET`, `POST`, `PUT`, `PATCH`, `DELETE`
+The HTTP method to use for the request.
+
+    ajax.get(String url, Object data)
+    ajax.post(String url, Object data)
+    ajax.put(String url, Object data)
+    ajax.patch(String url, Object data)
+    ajax.delete(String url, Object data)
+
+##### before: `function(Object settings)`
 A pre-request callback function that can be used to modify the xhr (XMLHTTPRequest) object before it is sent. Use this to set custom headers, etc. The xhr and settings objects are passed as arguments. This is an Ajax Event. Returning `false` in the beforeSend function will cancel the request.
-##### method (default: `'POST'`)
-The HTTP method to use for the request
-##### then
+##### then: `function(String status, mixed data)`
 A function to be called when the request finishes.
 #### Ajax setup
 Set default values for future Ajax requests. Its use is not recommended.<br>
@@ -48,4 +54,4 @@ For example, CSRF Protection in Laravel.
 -------- |---------|---------|---------|---------|---------
 Latest ✔ |Latest ✔ |Latest ✔ |Latest ✔ |Latest ✔ |9+✔ 
 ## License
-[MIT license](http://opensource.org/licenses/MIT)
+[MIT](http://opensource.org/licenses/MIT)
