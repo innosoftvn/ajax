@@ -67,7 +67,7 @@
                             statusText = 'warning';
                         }
                         if (_.httpRequest.status >= 400) {
-                            statusText = 'danger';
+                            statusText = 'error';
                         }
                         callback.call(this, statusText, _.httpRequest.response);
                     }
