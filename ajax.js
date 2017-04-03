@@ -69,7 +69,12 @@
                         if (_.httpRequest.status >= 400) {
                             statusText = 'error';
                         }
-                        callback.call(this, statusText, _.httpRequest.response);
+                        try {
+                            var data = JSON.parse(_.httpRequest.response);
+                            callback.call(this, statusText, data);
+                        } catch(e) {
+                            callback.call(this, statusText, _.httpRequest.response);
+                        }
                     }
                 }
             };
