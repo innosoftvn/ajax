@@ -1,6 +1,6 @@
 {
   "name": "innosoft-ajax",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Makes writing Ajax requests with XMLHttpRequest easier",
   "main": "ajax.js",
   "scripts": {
