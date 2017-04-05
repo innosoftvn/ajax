@@ -76,11 +76,15 @@
 
         self.settings.events = self.settings.events || {};
         for (var event in self.settings.events) {
-            xhr.addEventListener(event, self.settings.events[event]);
+            xhr.addEventListener(event, function(evt){
+                self.settings.events[event].call(self, evt);
+            });
         }
         self.settings.uploadEvents = self.settings.uploadEvents || {};
         for (var event in self.settings.uploadEvents) {
-            xhr.upload.addEventListener(event, self.settings.uploadEvents[event]);
+            xhr.upload.addEventListener(event, function(evt){
+                self.settings.uploadEvents[event].call(self, evt);
+            });
         }
 
         xhr.open(self.method, self.url);
