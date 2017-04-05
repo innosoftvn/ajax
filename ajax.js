@@ -45,18 +45,20 @@
         this.__ajaxSetup__ = merge(this.__ajaxSetup__, settings);
     };
 
-    Ajax.prototype.create = function (url, method, data, settings) {
+    Ajax.prototype.create = function (url, method, data, settings, setup) {
         this.url = url || '';
         this.method = method || 'get';
         this.data = data || {};
         this.settings = settings || {};
+        this.__ajaxSetup__ = setup || {};
     };
 
 
     ['get', 'post', 'put', 'patch', 'delete'].forEach(function (method) {
         Ajax.prototype[method] = function (url, data, settings) {
-            this.create(url, method, data, settings);
-            return this;
+            var _ = new Ajax();
+            _.create(url, method, data, settings, this.__ajaxSetup__);
+            return _;
         };
     });
 
@@ -76,13 +78,13 @@
 
         self.settings.events = self.settings.events || {};
         for (var event in self.settings.events) {
-            xhr.addEventListener(event, function(evt){
+            xhr.addEventListener(event, function (evt) {
                 self.settings.events[event].call(self, evt);
             });
         }
         self.settings.uploadEvents = self.settings.uploadEvents || {};
         for (var event in self.settings.uploadEvents) {
-            xhr.upload.addEventListener(event, function(evt){
+            xhr.upload.addEventListener(event, function (evt) {
                 self.settings.uploadEvents[event].call(self, evt);
             });
         }
