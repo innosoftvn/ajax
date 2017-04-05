@@ -14,8 +14,6 @@ Node
 
     ajax.post('/posts', {
         title: 'Ajax is simple'
-    }).before(function(){
-        //
     }).then(function(status, data){
         //
     });
@@ -24,17 +22,41 @@ Node
 ##### method: `GET`, `POST`, `PUT`, `PATCH`, `DELETE`
 The HTTP method to use for the request.
 
-    ajax.get(String url, Object data)
-    ajax.post(String url, Object data)
-    ajax.put(String url, Object data)
-    ajax.patch(String url, Object data)
-    ajax.delete(String url, Object data)
+    ajax.get(url, data [, settings])
+    ajax.post(url, data [, settings])
+    ajax.put(url, data [, settings])
+    ajax.patch(url, data [, settings])
+    ajax.delete(url, data [,settings])
 
-##### before: `function()`
-A pre-request callback function that can be used to modify the xhr (XMLHTTPRequest) object before it is sent. Use this to set custom headers, etc. The xhr and settings objects are passed as arguments. This is an Ajax Event. Returning `false` in the before function will cancel the request.
-##### then: `function(String status, mixed data)`
-A function to be called when the request finishes.
-#### Ajax setup
+##### then: `function(textStatus, data)`
+A function to be called when the request finishes. The function gets passed two arguments: The `data` response and a string categorizing the status of the request (`info`, `success`, `warning`, `error`).
+##### Settings
+These are the available config options for making requests.
+
+    ajax.post(url, data, {
+        contentType: false,     // default: true
+        headers: {
+            // custom headers to be sent
+        },
+        events: {
+            // progress on transfers from the server to the client (downloads)
+            progress: function(evt) {},
+            load: function(evt) {},
+            error: function(evt) {},
+            abort: function(evt) {}
+        },
+        uploadEvents: {
+            // progress on transfers from the client to the server (uploads)
+            progress: function(evt) {},
+            load: function(evt) {},
+            error: function(evt) {},
+            abort: function(evt) {}
+        }
+    }).then(function(status, data){
+        //
+    });
+
+##### Ajax setup
 Set default values for future Ajax requests. Its use is not recommended.<br>
 For example, CSRF Protection in Laravel.
 

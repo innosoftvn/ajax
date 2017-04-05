@@ -1,12 +1,23 @@
 (function (window) {
     "use strict";
 
-    var __ajaxSetup__ = {}, ajax = {};
+    function Ajax() {
+        this.__ajaxSetup__ = {};
+        this.url = '';
+        this.method = 'get';
+        this.data = {};
+        this.settings = {};
+    }
 
-    function defaults(target, obj) {
-        for (var prop in obj) {
-            target[prop] = target[prop] || obj[prop];
+    function merge(obj1, obj2) {
+        var obj3 = {};
+        for (var attrname in obj1) {
+            obj3[attrname] = obj1[attrname];
         }
+        for (var attrname in obj2) {
+            obj3[attrname] = obj2[attrname];
+        }
+        return obj3;
     }
 
     function getQuery(queryParams, prefix) {
@@ -30,97 +41,84 @@
         return query;
     }
 
-    function _fetch(url, method, data, settings, httpRequest) {
-        var _ = {};
+    Ajax.prototype.setup = function (settings) {
+        this.__ajaxSetup__ = merge(this.__ajaxSetup__, settings);
+    };
 
-        _.url = url || '';
-        _.method = method || 'GET';
-        _.data = data || {};
-        _.settings = settings || {};
-        _.httpRequest = httpRequest || new XMLHttpRequest();
+    Ajax.prototype.create = function (url, method, data, settings) {
+        this.url = url || '';
+        this.method = method || 'get';
+        this.data = data || {};
+        this.settings = settings || {};
+    };
 
-        if (!_.httpRequest) {
+
+    ['get', 'post', 'put', 'patch', 'delete'].forEach(function (method) {
+        Ajax.prototype[method] = function (url, data, settings) {
+            this.create(url, method, data, settings);
+            return this;
+        };
+    });
+
+    Ajax.prototype.then = function (callback) {
+        var xhr = new XMLHttpRequest();
+        var self = this;
+        if (!xhr) {
             console.log('Giving up :( Cannot create an XMLHTTP instance');
             return false;
         }
 
-        _.before = function (callback) {
-            if (callback.call(this) === false) {
-                defaults(_.settings, {abort: true});
-            }
-            return _fetch(_.url, _.method, _.data, _.settings, _.httpRequest);
-        };
+        self.settings = merge(self.settings, self.__ajaxSetup__);
+        if (self.method == 'get') {
+            self.url = [self.url, getQuery(self.data || {}).join('&')].join('?');
+            self.data = {};
+        }
 
-        _.then = function (callback) {
-            if (_.settings.abort && _.settings.abort === true){
-                return false;
-            }
-            defaults(_.settings, __ajaxSetup__);
-            _.httpRequest.onreadystatechange = function () {
-                if (_.httpRequest.readyState === XMLHttpRequest.DONE) {
-                    if (callback && typeof callback == 'function') {
-                        var statusText = 'info';
-                        if (_.httpRequest.status >= 200) {
-                            statusText = 'success';
-                        }
-                        if (_.httpRequest.status >= 300) {
-                            statusText = 'warning';
-                        }
-                        if (_.httpRequest.status >= 400) {
-                            statusText = 'error';
-                        }
-                        try {
-                            var data = JSON.parse(_.httpRequest.response);
-                            callback.call(this, statusText, data);
-                        } catch(e) {
-                            callback.call(this, statusText, _.httpRequest.response);
-                        }
-                    }
+        self.settings.events = self.settings.events || {};
+        for (var event in self.settings.events) {
+            xhr.addEventListener(event, self.settings.events[event]);
+        }
+        self.settings.uploadEvents = self.settings.uploadEvents || {};
+        for (var event in self.settings.uploadEvents) {
+            xhr.upload.addEventListener(event, self.settings.uploadEvents[event]);
+        }
+
+        xhr.open(self.method, self.url);
+        xhr.responseType = self.settings.responseType || 'json';
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === XMLHttpRequest.DONE) {
+                var statusText = 'info';
+                if (xhr.status >= 200) {
+                    statusText = 'success';
                 }
-            };
-            if (_.method == 'GET') {
-                _.url = [_.url, getQuery(_.data || {}).join('&')].join('?');
-                _.data = {};
+                if (xhr.status >= 300) {
+                    statusText = 'warning';
+                }
+                if (xhr.status >= 400) {
+                    statusText = 'error';
+                }
+                try {
+                    var data = JSON.parse(xhr.response);
+                    callback.call(self, statusText, data);
+                } catch (e) {
+                    callback.call(self, statusText, xhr.response);
+                }
             }
-            _.httpRequest.open(_.method, _.url);
-            _.httpRequest.responseType = 'json';
-            _.settings.headers = _.settings.headers || {};
-            defaults(_.settings.headers, {
+        };
+        self.settings.headers = self.settings.headers || {};
+        if (self.settings.contentType !== false) {
+            self.settings.headers = merge(self.settings.headers, {
                 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
             });
-            for (var prop in _.settings.headers) {
-                _.httpRequest.setRequestHeader(prop, _.settings.headers[prop]);
-            }
+        }
+        for (var prop in self.settings.headers) {
+            xhr.setRequestHeader(prop, self.settings.headers[prop]);
+        }
 
-            _.httpRequest.send(getQuery(_.data || {}).join('&'));
-        };
-
-        return _;
-    }
-
-    ajax.setup = function(settings){
-        defaults(__ajaxSetup__, settings);
+        xhr.send(self.settings.contentType === false ? self.data : getQuery(self.data || {}).join('&'));
     };
 
-    ajax.get = function(url, data){
-        return new _fetch(url, 'GET', data);
-    };
-
-    ajax.post = function(url, data){
-        return new _fetch(url, 'POST', data);
-    };
-
-    ajax.put = function(url, data){
-        return new _fetch(url, 'PUT', data);
-    };
-
-    ajax.patch = function(url, data){
-        return new _fetch(url, 'PATCH', data);
-    };
-
-    ajax['delete'] = function(url, data){
-        return new _fetch(url, 'DELETE', data);
-    };
+    var ajax = new Ajax();
 
     // Support CommonJS, AMD & browser
     if (typeof exports === 'object') {
